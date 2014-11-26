@@ -406,6 +406,7 @@ func (s *Server) doPropfind(w http.ResponseWriter, r *http.Request) {
 
 	path := s.url2path(r.URL)
 	if !s.pathExists(path) {
+		log.Println("404", r.URL, path)
 		http.Error(w, path, StatusNotFound)
 		// TODO: if locked (parent locked?) return multistatus with locked error as propstat
 		return
@@ -644,6 +645,7 @@ func (s *Server) serveResource(w http.ResponseWriter, r *http.Request, serveCont
 	f, err := s.Fs.Open(path)
 	if err != nil {
 		logger.Info("DAV:", "404, File missing on disk:", r.RequestURI, "error", err)
+		log.Println("404", r.RequestURI)
 		http.Error(w, r.RequestURI, StatusNotFound)
 		return
 	}
@@ -655,6 +657,7 @@ func (s *Server) serveResource(w http.ResponseWriter, r *http.Request, serveCont
 	if err != nil {
 		// TODO: log locally also, configurably
 		logger.Info("DAV:", "404, File missing on disk:", r.RequestURI, "error", err)
+		log.Println("404", r.RequestURI)
 		http.Error(w, r.RequestURI, StatusNotFound)
 		return
 	}
@@ -696,6 +699,7 @@ func (s *Server) deleteResource(path string, w http.ResponseWriter, r *http.Requ
 	}
 
 	if !s.pathExists(path) {
+		log.Println("404", r.RequestURI)
 		w.WriteHeader(StatusNotFound)
 		return false
 	}

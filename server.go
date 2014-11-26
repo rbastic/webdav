@@ -614,7 +614,7 @@ func (s *Server) doMkcol(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := s.Fs.Mkdir(path); err != nil {
+	if err := os.MkdirAll(path, 600); err != nil {
 		logger.Info("DAV:", "error with mkdir path", path, "error", err)
 		w.WriteHeader(StatusConflict)
 		return
@@ -799,10 +799,12 @@ func (s *Server) doPut(w http.ResponseWriter, r *http.Request) {
 
 	// TODO: content range / partial put
 
+                /*
 	err := os.MkdirAll(path, 0600)
 	if err != nil {
 		log.Printf("error %+v making directory %+v  ", err, path)
 	}
+    */
 
 	// truncate file if exists
 	file, err := s.Fs.Create(path)

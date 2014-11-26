@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/der-antikeks/go-webdav"
+	"github.com/rbastic/webdav"
 )
 
 var (
@@ -14,7 +14,7 @@ var (
 )
 
 func main() {
-	os.Mkdir(path, os.ModeDir)
+	os.Mkdir(path, 0755)
 
 	// http.StripPrefix is not working, webdav.Server has no knowledge
 	// of stripped component, but needs for COPY/MOVE methods.
@@ -27,8 +27,8 @@ func main() {
 
 	http.HandleFunc("/", index)
 
-	log.Println("Listening on http://127.0.0.1:8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Println("Listening on http://127.0.0.1:8081")
+	log.Fatal(http.ListenAndServe(":8081", nil))
 }
 
 func index(w http.ResponseWriter, r *http.Request) {

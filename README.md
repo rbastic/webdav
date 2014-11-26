@@ -1,3 +1,6 @@
+
+This is a fork of gogits/webdav. Please see pocketdav.
+
 # webdav
 
 __TODO (litmus tests):__

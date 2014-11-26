@@ -335,6 +335,7 @@ func (s *Server) doPropfind(w http.ResponseWriter, r *http.Request) {
 	if !s.Listings {
 		w.Header().Set("Allow", s.methodsAllowed(s.url2path(r.URL)))
 		log.Println("Method not allowed! doPropFind")
+		logger.Info("DAV:", "Method not allowed! doPropFind", path, "error", err)
 		w.WriteHeader(StatusMethodNotAllowed)
 		return
 	}
@@ -594,6 +595,7 @@ func (s *Server) doMkcol(w http.ResponseWriter, r *http.Request) {
 	if s.pathExists(path) {
 		w.Header().Set("Allow", s.methodsAllowed(s.url2path(r.URL)))
 		log.Println("path exists already, method not allowed!")
+		logger.Info("DAV:", "path exists already, method not allowed!", path, "error", err)
 		w.WriteHeader(StatusMethodNotAllowed)
 		return
 	}
@@ -784,6 +786,7 @@ func (s *Server) doPut(w http.ResponseWriter, r *http.Request) {
 	if s.pathIsDirectory(path) {
 		// use MKCOL instead
 		log.Println("use mkcol instead perhaps, path", path, "is already a directory")
+		logger.Info("DAV:", "use mkcol instead perhaps, path", path, "error", err)
 		w.WriteHeader(StatusMethodNotAllowed)
 		return
 	}

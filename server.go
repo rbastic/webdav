@@ -334,6 +334,7 @@ func (s *Server) unlockResource(path string) {
 func (s *Server) doPropfind(w http.ResponseWriter, r *http.Request) {
 	if !s.Listings {
 		w.Header().Set("Allow", s.methodsAllowed(s.url2path(r.URL)))
+		log.Println("Method not allowed! doPropFind")
 		w.WriteHeader(StatusMethodNotAllowed)
 		return
 	}
@@ -592,6 +593,7 @@ func (s *Server) doMkcol(w http.ResponseWriter, r *http.Request) {
 	path := s.url2path(r.URL)
 	if s.pathExists(path) {
 		w.Header().Set("Allow", s.methodsAllowed(s.url2path(r.URL)))
+		log.Println("path exists already, method not allowed!")
 		w.WriteHeader(StatusMethodNotAllowed)
 		return
 	}
@@ -781,6 +783,7 @@ func (s *Server) doPut(w http.ResponseWriter, r *http.Request) {
 
 	if s.pathIsDirectory(path) {
 		// use MKCOL instead
+		log.Println("use mkcol instead perhaps, path", path, "is already a directory")
 		w.WriteHeader(StatusMethodNotAllowed)
 		return
 	}

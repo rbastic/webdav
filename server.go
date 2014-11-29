@@ -17,24 +17,8 @@ import (
 	"strings"
 	"time"
 
-	qlog "github.com/qiniu/log"
 	"log"
 )
-
-var logger *qlog.Logger
-
-func newLogger(execDir string) {
-	logPath := execDir + "/log/webdav.log"
-	os.MkdirAll(path.Dir(logPath), os.ModePerm)
-
-	f, err := os.OpenFile(logPath, os.O_WRONLY|os.O_APPEND|os.O_CREATE, os.ModePerm)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	logger = qlog.New(f, "", qlog.Ldate|qlog.Ltime)
-	logger.Info("Start logging webdav...")
-}
 
 func ExecDir() (string, error) {
 	file, err := exec.LookPath(os.Args[0])
@@ -161,7 +145,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		s.doUnlock(w, r)
 
 	default:
-		logger.Info("DAV:", "unknown method", r.Method)
+		log.Println("DAV:", "unknown method", r.Method)
 		w.WriteHeader(StatusBadRequest)
 	}
 }
@@ -335,7 +319,7 @@ func (s *Server) doPropfind(w http.ResponseWriter, r *http.Request) {
 	if !s.Listings {
 		w.Header().Set("Allow", s.methodsAllowed(s.url2path(r.URL)))
 		log.Println("Method not allowed! doPropFind")
-		logger.Info("DAV:", "Method not allowed! doPropFind")
+		log.Println("DAV:", "Method not allowed! doPropFind")
 		w.WriteHeader(StatusMethodNotAllowed)
 		return
 	}
@@ -596,7 +580,7 @@ func (s *Server) doMkcol(w http.ResponseWriter, r *http.Request) {
 	if s.pathExists(path) {
 		w.Header().Set("Allow", s.methodsAllowed(s.url2path(r.URL)))
 		log.Println("path exists already, method not allowed!")
-		logger.Info("DAV:", "path exists already, method not allowed!", path)
+		log.Println("DAV:", "path exists already, method not allowed!", path)
 		w.WriteHeader(StatusMethodNotAllowed)
 		return
 	}
@@ -615,7 +599,7 @@ func (s *Server) doMkcol(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := os.MkdirAll(path, 600); err != nil {
-		logger.Info("DAV:", "error with mkdir path", path, "error", err)
+		log.Println("DAV:", "error with mkdir path", path, "error", err)
 		w.WriteHeader(StatusConflict)
 		return
 	}
@@ -644,7 +628,7 @@ func (s *Server) serveResource(w http.ResponseWriter, r *http.Request, serveCont
 
 	f, err := s.Fs.Open(path)
 	if err != nil {
-		logger.Info("DAV:", "404, File missing on disk:", r.RequestURI, "error", err)
+		log.Println("DAV:", "404, File missing on disk:", r.RequestURI, "error", err)
 		log.Println("404", r.RequestURI)
 		http.Error(w, r.RequestURI, StatusNotFound)
 		return
@@ -656,7 +640,7 @@ func (s *Server) serveResource(w http.ResponseWriter, r *http.Request, serveCont
 	fi, err := f.Stat()
 	if err != nil {
 		// TODO: log locally also, configurably
-		logger.Info("DAV:", "404, File missing on disk:", r.RequestURI, "error", err)
+		log.Println("DAV:", "404, File missing on disk:", r.RequestURI, "error", err)
 		log.Println("404", r.RequestURI)
 		http.Error(w, r.RequestURI, StatusNotFound)
 		return
@@ -674,19 +658,19 @@ func (s *Server) serveResource(w http.ResponseWriter, r *http.Request, serveCont
 // http://www.webdav.org/specs/rfc4918.html#METHOD_DELETE
 func (s *Server) doDelete(w http.ResponseWriter, r *http.Request) {
 	if s.ReadOnly {
-		logger.Info("DAV:", "DELETE attempted, file read-only", r.URL)
+		log.Println("DAV:", "DELETE attempted, file read-only", r.URL)
 		w.WriteHeader(StatusForbidden)
 		return
 	}
 
 	if s.isLockedRequest(r) {
-		logger.Info("DAV:", "DELETE attempted, file locked", r.URL)
+		log.Println("DAV:", "DELETE attempted, file locked", r.URL)
 		w.WriteHeader(StatusLocked)
 		return
 	}
 
 	s.deleteResource(s.url2path(r.URL), w, r, true)
-	logger.Info("DAV:", "DELETE successful", r.URL)
+	log.Println("DAV:", "DELETE successful", r.URL)
 }
 
 func (s *Server) deleteResource(path string, w http.ResponseWriter, r *http.Request, setStatus bool) bool {
@@ -790,7 +774,7 @@ func (s *Server) doPut(w http.ResponseWriter, r *http.Request) {
 	if s.pathIsDirectory(path) {
 		// use MKCOL instead
 		log.Println("use mkcol instead perhaps, path", path, "is already a directory")
-		logger.Info("DAV:", "use mkcol instead perhaps, path", path)
+		log.Println("DAV:", "use mkcol instead perhaps, path", path)
 		w.WriteHeader(StatusMethodNotAllowed)
 		return
 	}
@@ -810,7 +794,7 @@ func (s *Server) doPut(w http.ResponseWriter, r *http.Request) {
 	file, err := s.Fs.Create(path)
 	if err != nil {
 		// TODO: having stupid problems?
-		logger.Info("DAV:", "error with create path", path, "error", err)
+		log.Println("DAV:", "error with create path", path, "error", err)
 		log.Println("DAV:", "error with create path", path, "error", err)
 		w.WriteHeader(StatusConflict)
 		return
@@ -822,12 +806,12 @@ func (s *Server) doPut(w http.ResponseWriter, r *http.Request) {
 	// using temporary filenames and then atomic rename's ?
 
 	if _, err := io.Copy(file, r.Body); err != nil {
-		logger.Info("DAV:", "error with ioCopy", file, "error", err)
+		log.Println("DAV:", "error with ioCopy", file, "error", err)
 		log.Println("DAV:", "error with ioCopy", file, "error", err)
 		w.WriteHeader(StatusConflict)
 	} else {
 		if exists {
-			logger.Info("DAV:", "status no content", file, "error", err)
+			log.Println("DAV:", "status no content", file, "error", err)
 			w.WriteHeader(StatusNoContent)
 		} else {
 			w.WriteHeader(StatusCreated)
@@ -927,7 +911,7 @@ func (s *Server) copyResource(w http.ResponseWriter, r *http.Request) bool {
 		if err := s.CopyFile(source, dest); err != nil {
 			// TODO: always conflict? e.g. copy to non-existant path
 			//w.WriteHeader(StatusInternalServerError)
-			logger.Info("DAV:", "error with CopyFile source", source, "dest", dest, "error", err)
+			log.Println("DAV:", "error with CopyFile source", source, "dest", dest, "error", err)
 			w.WriteHeader(StatusConflict)
 			return false
 		}
@@ -935,7 +919,7 @@ func (s *Server) copyResource(w http.ResponseWriter, r *http.Request) bool {
 		// copy only collection, not its internal members
 		// http://www.webdav.org/specs/rfc4918.html#copy.for.collections
 		if err := s.Fs.Mkdir(dest); err != nil {
-			logger.Info("DAV:", "error with mkdir dest", dest, "error", err)
+			log.Println("DAV:", "error with mkdir dest", dest, "error", err)
 			w.WriteHeader(StatusConflict)
 			return false
 		}
@@ -1114,7 +1098,7 @@ func (s *Server) doLock(w http.ResponseWriter, r *http.Request) {
 
 	//dc = self.IFACE_CLASS
 
-	logger.Info("LOCKing resource %s", r.Header)
+	log.Println("LOCKing resource %s", r.Header)
 
 	bbody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -1132,11 +1116,11 @@ func (s *Server) doLock(w http.ResponseWriter, r *http.Request) {
 	//uri = urlparse.urljoin(self.get_baseuri(dc), self.path)
 	//uri = urllib.unquote(uri)
 	uri := r.RequestURI
-	logger.Info("do_LOCK: uri = %s", uri)
+	log.Println("do_LOCK: uri = %s", uri)
 
 	ifheader := r.Header.Get("If")
 	alreadylocked := s.isLocked(uri, ifheader)
-	logger.Info("do_LOCK: alreadylocked = %s", alreadylocked)
+	log.Println("do_LOCK: alreadylocked = %s", alreadylocked)
 
 	if body != "" && alreadylocked {
 		//# Full LOCK request but resource already locked
@@ -1240,7 +1224,7 @@ func (s *Server) doUnlock(w http.ResponseWriter, r *http.Request) {
 	//dc = self.IFACE_CLASS
 
 	//if self._config.DAV.getboolean('verbose') is True:
-	logger.Info("UNLOCKing resource", r.Header)
+	log.Println("UNLOCKing resource", r.Header)
 
 	//uri := urlparse.urljoin(self.get_baseuri(dc), self.path)
 	//uri = urllib.unquote(uri)

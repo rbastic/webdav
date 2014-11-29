@@ -1,5 +1,8 @@
 
-This is a fork of gogits/webdav. Please see pocketdav.
+This is a fork of gogits/webdav. Please see PocketDAV unless you are interested
+in helping improve this repository.
+
+notes from gogits:
 
 # webdav
 

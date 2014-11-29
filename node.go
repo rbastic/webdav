@@ -14,12 +14,12 @@ type Node struct {
 	Parent   *Node
 }
 
-func NodeFromXmlString(xmls string) (*Node, error) {
+func NodeFromXMLString(xmls string) (*Node, error) {
 	rd := strings.NewReader(xmls)
-	return NodeFromXml(rd)
+	return NodeFromXML(rd)
 }
 
-func NodeFromXml(r io.Reader) (*Node, error) {
+func NodeFromXML(r io.Reader) (*Node, error) {
 	var cur, parent *Node
 
 	decoder := xml.NewDecoder(r)
@@ -38,7 +38,7 @@ func NodeFromXml(r io.Reader) (*Node, error) {
 
 			// if tok.Name.Space != "DAV:" {
 			if tok.Name.Space == "" {
-				return nil, ErrMalformedXml
+				return nil, ErrMalformedXML
 			}
 
 			cur = &Node{

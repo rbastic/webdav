@@ -35,7 +35,7 @@ func NewLock(uri, creator, owner string) *Lock {
 
 // parse a lock from a http request
 func ParseLockString(body string) (*Lock, error) {
-	node, err := NodeFromXmlString(body)
+	node, err := NodeFromXMLString(body)
 	if err != nil {
 		return nil, err
 	}

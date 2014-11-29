@@ -74,9 +74,9 @@ type Server struct {
 	// access to a collection of named files
 	Fs FileSystem
 
-	tokens_to_lock map[string]*Lock
+	tokensToLock map[string]*Lock
 
-	path_to_token map[string]string
+	pathToToken map[string]string
 }
 
 func generateToken() string {
@@ -87,11 +87,11 @@ func generateToken() string {
 
 func NewServer(dir, prefix string, listDir bool) *Server {
 	return &Server{
-		Fs:             Dir(dir),
-		TrimPrefix:     prefix,
-		Listings:       listDir,
-		tokens_to_lock: make(map[string]*Lock),
-		path_to_token:  make(map[string]string),
+		Fs:           Dir(dir),
+		TrimPrefix:   prefix,
+		Listings:     listDir,
+		tokensToLock: make(map[string]*Lock),
+		pathToToken:  make(map[string]string),
 	}
 }
 
@@ -267,7 +267,7 @@ func (s *Server) isLockedRequest(r *http.Request) bool {
 
 // is path locked?
 func (s *Server) isLocked(path, ifHeader string) bool {
-	token, ok := s.path_to_token[path]
+	token, ok := s.pathToToken[path]
 	if !ok {
 		return false
 	}
@@ -297,28 +297,28 @@ func (s *Server) isLocked(path, ifHeader string) bool {
 }
 
 func (s *Server) hasLock(token string) bool {
-	_, ok := s.tokens_to_lock[token]
+	_, ok := s.tokensToLock[token]
 	return ok
 }
 
 func (s *Server) getToken(uri string) string {
-	return s.path_to_token[uri]
+	return s.pathToToken[uri]
 }
 
 func (s *Server) getLock(token string) *Lock {
-	return s.tokens_to_lock[token]
+	return s.tokensToLock[token]
 }
 
 func (s *Server) delLock(token string) {
-	if lock, ok := s.tokens_to_lock[token]; ok {
-		delete(s.path_to_token, lock.uri)
-		delete(s.tokens_to_lock, token)
+	if lock, ok := s.tokensToLock[token]; ok {
+		delete(s.pathToToken, lock.uri)
+		delete(s.tokensToLock, token)
 	}
 }
 
 func (s *Server) setLock(lock *Lock) {
-	s.tokens_to_lock[lock.token] = lock
-	s.path_to_token[lock.uri] = lock.token
+	s.tokensToLock[lock.token] = lock
+	s.pathToToken[lock.uri] = lock.token
 }
 
 func (s *Server) lockResource(path string) {
@@ -359,7 +359,7 @@ func (s *Server) doPropfind(w http.ResponseWriter, r *http.Request) {
 	var includes []string
 
 	if r.ContentLength > 0 {
-		propfind, err := NodeFromXml(r.Body)
+		propfind, err := NodeFromXML(r.Body)
 		if err != nil {
 			// TODO: error logging?
 			w.WriteHeader(StatusBadRequest)
@@ -603,7 +603,7 @@ func (s *Server) doMkcol(w http.ResponseWriter, r *http.Request) {
 
 	// MKCOL may contain messagebody, precise behavior is undefined
 	if r.ContentLength > 0 {
-		_, err := NodeFromXml(r.Body)
+		_, err := NodeFromXML(r.Body)
 		if err != nil {
 			// TODO: error logging?
 			w.WriteHeader(StatusBadRequest)
@@ -799,12 +799,12 @@ func (s *Server) doPut(w http.ResponseWriter, r *http.Request) {
 
 	// TODO: content range / partial put
 
-                /*
-	err := os.MkdirAll(path, 0600)
-	if err != nil {
-		log.Printf("error %+v making directory %+v  ", err, path)
-	}
-    */
+	/*
+		err := os.MkdirAll(path, 0600)
+		if err != nil {
+			log.Printf("error %+v making directory %+v  ", err, path)
+		}
+	*/
 
 	// truncate file if exists
 	file, err := s.Fs.Create(path)
@@ -1039,7 +1039,7 @@ func (s *Server) copyCollection(source, dest string, w http.ResponseWriter, r *h
 }
 
 /*func (s *Server) _lock_unlock_parse(body string) (map[string]string, error) {
-	node, err := NodeFromXmlString(body)
+	node, err := NodeFromXMLString(body)
 	if err != nil {
 		return nil, err
 	}
@@ -1062,7 +1062,7 @@ func (s *Server) copyCollection(source, dest string, w http.ResponseWriter, r *h
 	return data, nil
 }*/
 
-func (s *Server) _lock_unlock_create(lock *Lock, depth string) (string, string) {
+func (s *Server) _lockUnlockCreate(lock *Lock, depth string) (string, string) {
 	//lock := &Lock{uri: uri, creator: creator}
 	iscollection := (lock.uri[len(lock.uri)-1] == '/') //# very dumb collection check
 
@@ -1157,7 +1157,7 @@ func (s *Server) doLock(w http.ResponseWriter, r *http.Request) {
 		lock.uri = r.RequestURI
 		lock.token = generateToken()
 		//fmt.Println("lock:", data)
-		token, result := s._lock_unlock_create(lock, depth)
+		token, result := s._lockUnlockCreate(lock, depth)
 
 		if result != "" {
 			w.Write([]byte(result))

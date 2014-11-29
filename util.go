@@ -55,25 +55,25 @@ func IfParser(hdr string) []*TagList {
 
 	/*
 
-		  out := make([]*TagList, 0)
-	      i := 0
-		  for {
-		      m := IfHdr.FindString(hdr[i:])
-		      if m == ""{
-		       break
-		   	}
+			  out := make([]*TagList, 0)
+		      i := 0
+			  for {
+			      m := IfHdr.FindString(hdr[i:])
+			      if m == ""{
+			       break
+			   	}
 
-		      i = i + m.end()
-		      tag := new(TagList)
-		      tag.resource = m.group("resource")
-		      // We need to delete < >
-		      if tag.resource != "" {
-		          tag.resource = tag.resource[1:-1]
-		      }
-		      listitem = m.group("listitem")
-		      tag.NOTTED, tag.list = ListParser(listitem)
-		      append(out, tag)
-		  }*/
+			      i = i + m.end()
+			      tag := new(TagList)
+			      tag.resource = m.group("resource")
+			      // We need to delete < >
+			      if tag.resource != "" {
+			          tag.resource = tag.resource[1:-1]
+			      }
+			      listitem = m.group("listitem")
+			      tag.NOTTED, tag.list = ListParser(listitem)
+			      append(out, tag)
+			  }*/
 
 	return out
 }

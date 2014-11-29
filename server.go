@@ -22,6 +22,10 @@ import (
 func init() {
 }
 
+func FlushGlog() {
+    glog.Flush()
+}
+
 func Handler(root FileSystem) http.Handler {
 	return &Server{Fs: root}
 }

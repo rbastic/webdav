@@ -23,7 +23,7 @@ func init() {
 }
 
 func FlushGlog() {
-    glog.Flush()
+	glog.Flush()
 }
 
 func Handler(root FileSystem) http.Handler {

@@ -33,7 +33,6 @@ const (
 // extended status codes, http://www.webdav.org/specs/rfc4918.html#status.code.extensions.to.http11
 const (
 	StatusMulti               = 207
-	StatusUnprocessableEntity = 422
 	StatusLocked              = 423
 	StatusFailedDependency    = 424
 	StatusInsufficientStorage = 507
@@ -42,7 +41,6 @@ const (
 var statusText = map[int]string{
 	StatusMovedTemporarily:    "Moved Temporarily",
 	StatusMulti:               "Multi-Status",
-	StatusUnprocessableEntity: "Unprocessable Entity",
 	StatusLocked:              "Locked",
 	StatusFailedDependency:    "Failed Dependency",
 	StatusInsufficientStorage: "Insufficient Storage",
@@ -61,5 +59,4 @@ func StatusText(code int) string {
 var (
 	ErrInvalidCharPath = errors.New("invalid character in file path")
 	ErrNotImplemented  = errors.New("feature not yet implemented")
-	ErrMalformedXML    = errors.New("XML is not well-formed")
 )

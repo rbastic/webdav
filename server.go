@@ -15,14 +15,19 @@ import (
 func init() {
 }
 
+// FlushGlog exposes the glog object for you, so you can flush your log when you exit.
+// E.g. Call webdav.FlushGlog() in whatever shutdown/finalizer code you have before your
+// server terminates.
 func FlushGlog() {
 	glog.Flush()
 }
 
+// Handler configures the FileSystem object with the Server struct
 func Handler(root FileSystem) http.Handler {
 	return &Server{Fs: root}
 }
 
+// Server represents a given filesystem-server
 type Server struct {
 	// trimmed path prefix
 	TrimPrefix string
@@ -43,6 +48,7 @@ func generateToken() string {
 		r.Int31(), r.Int31(), time.Now().UnixNano())
 }
 
+// NewServer allows us to create a new Server struct, for a given filesystem path
 func NewServer(dir, prefix string, listDir bool) *Server {
 	return &Server{
 		Fs:         Dir(dir),
@@ -73,11 +79,13 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // convert request url to path
 func (s *Server) url2path(u *url.URL) string {
+	glog.Infoln("u.Path=", u.Path)
 	if u.Path == "" {
 		return "/"
 	}
 
 	if p := strings.TrimPrefix(u.Path, s.TrimPrefix); len(p) < len(u.Path) {
+		glog.Infoln("strings.Trim,", p, " = ", strings.Trim(p, "/"))
 		return strings.Trim(p, "/")
 	}
 
@@ -116,11 +124,13 @@ func (s *Server) pathIsDirectory(path string) bool {
 
 // http://www.webdav.org/specs/rfc4918.html#rfc.section.9.4
 func (s *Server) doGet(w http.ResponseWriter, r *http.Request) {
+	glog.Infoln("DAV", "GET", r.RequestURI)
 	s.serveResource(w, r, true)
 }
 
 // http://www.webdav.org/specs/rfc4918.html#rfc.section.9.4
 func (s *Server) doHead(w http.ResponseWriter, r *http.Request) {
+	glog.Infoln("DAV", "HEAD", r.RequestURI)
 	s.serveResource(w, r, false)
 }
 
@@ -196,9 +206,6 @@ func (s *Server) deleteResource(path string, w http.ResponseWriter, r *http.Requ
 	return true
 }
 
-// http://www.webdav.org/specs/rfc4918.html#METHOD_PUT
-// TODO(rbastic): we should not attempt to be RFC compatible, but rather, usable
-// in the sense of the problem that photosrv is trying to solve.
 func (s *Server) doPut(w http.ResponseWriter, r *http.Request) {
 	if s.ReadOnly {
 		w.WriteHeader(StatusForbidden)
@@ -217,7 +224,7 @@ func (s *Server) doPut(w http.ResponseWriter, r *http.Request) {
 
 	exists := s.pathExists(path)
 
-	// TODO: content range / partial put
+	// TODO: content range / partial put ?, re-enable os.MkdirAll()
 
 	/*
 		err := os.MkdirAll(path, 0600)
@@ -234,7 +241,6 @@ func (s *Server) doPut(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(StatusConflict)
 		return
 	}
-	defer file.Close()
 
 	// XXX: investigate how io.Copy() is implemented, is it thread-safe or do
 	// we need to change this implementation to work more like how nginx's does,
@@ -243,6 +249,7 @@ func (s *Server) doPut(w http.ResponseWriter, r *http.Request) {
 	if _, err := io.Copy(file, r.Body); err != nil {
 		glog.Infoln("DAV:", "error with ioCopy", file, "error", err)
 		w.WriteHeader(StatusConflict)
+		file.Close()
 	} else {
 		if exists {
 			glog.Infoln("DAV:", "status no content", file, "error", err)
@@ -251,5 +258,5 @@ func (s *Server) doPut(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(StatusCreated)
 		}
 	}
-
+	file.Close()
 }

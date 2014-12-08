@@ -1,5 +1,5 @@
 /*
-package webdav provides WEBDAV client and server implementations
+Package webdav provides WEBDAV client and server implementations
 
 webdav java
 	http://svn.apache.org/repos/asf/tomcat/tc7.0.x/trunk/java/org/apache/catalina/servlets/WebdavServlet.java

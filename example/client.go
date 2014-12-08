@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/der-antikeks/go-webdav"
+	"github.com/rbastic/webdav"
 )
 
 func main() {

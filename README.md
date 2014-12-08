@@ -1,15 +1,12 @@
 
-See rbastic/pocketdav for dependency management.
+See rbastic/pocketdav for an example of embedding this package.
 
-This is a fork of gogits/webdav. Please see PocketDAV unless you are interested
-in helping improve this repository.
+rbastic/webdav only supports a few methods: GET, HEAD, PUT, and DELETE.
 
-I'm not interested in the following: RFC compliance, passing litmus tests, et cetera.
-Before you spit in my face, I assure you, I have the best of intentions. Don't we all?
+This is a fork of gogits/webdav. However, I threw out basically everything
+because I don't need those other features.
 
-[TODO: maybe I should patch this README up before I commit.]
-
-notes from gogits:
-
-# webdav
+The package is now less than 500 lines of code, now passes golint (some
+better documentation needs to happen, as expected), uses 'glog',and basically
+all XML-related WebDAV extensions are gone, et cetera.
 

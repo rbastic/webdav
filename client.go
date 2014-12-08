@@ -1,13 +1,7 @@
 package webdav
 
-import ()
-
+// FileSystemCloser is an interface for webdav to wrap basic filesystem ops. See filesystem.go
 type FileSystemCloser interface {
 	FileSystem
 	Close() error
-}
-
-func Dial(url string) (FileSystemCloser, error) {
-	// TODO
-	return nil, ErrNotImplemented
 }

@@ -1,49 +1,15 @@
 
+See rbastic/pocketdav for dependency management.
+
 This is a fork of gogits/webdav. Please see PocketDAV unless you are interested
 in helping improve this repository.
+
+I'm not interested in the following: RFC compliance, passing litmus tests, et cetera.
+Before you spit in my face, I assure you, I have the best of intentions. Don't we all?
+
+[TODO: maybe I should patch this README up before I commit.]
 
 notes from gogits:
 
 # webdav
 
-__TODO (litmus tests):__
-* basic..... pass
-* copymove.. pass
-* props..... FAILED
-	* init.................. pass
-	* begin................. pass
-	* propfind_invalid...... pass
-	* propfind_invalid2..... pass
-	* propfind_d0........... pass
-	* propinit.............. pass
-	* propset............... FAIL
-	* propget............... SKIPPED
-	* propextended.......... pass
-	* propmove.............. SKIPPED
-	* propget............... SKIPPED
-	* propdeletes........... SKIPPED
-	* propget............... SKIPPED
-	* propreplace........... SKIPPED
-	* propget............... SKIPPED
-	* propnullns............ SKIPPED
-	* propget............... SKIPPED
-	* prophighunicode....... SKIPPED
-	* propget............... SKIPPED
-	* propremoveset......... SKIPPED
-	* propget............... SKIPPED
-	* propsetremove......... SKIPPED
-	* propget............... SKIPPED
-	* propvalnspace......... SKIPPED
-	* propwformed........... pass
-	* propinit.............. pass
-	* propmanyns............ FAIL
-	* propget............... FAIL
-	* propcleanup........... pass
-	* finish................ pass
-* locks..... SKIPPED
-* http...... SKIPPED
-
-__future:__
-* server
-* client
-* replace litmus test with plain go tests

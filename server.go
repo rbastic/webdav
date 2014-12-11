@@ -212,29 +212,33 @@ func (s *Server) doPut(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(StatusForbidden)
 		return
 	}
-
 	myPath := s.url2path(r.URL)
 
+	/*
+	 * TODO: do something about this.
 	if s.pathIsDirectory(myPath) {
 		// use MKCOL instead
 		glog.Infoln("DAV:", "use mkcol instead perhaps, path", myPath)
 		w.WriteHeader(StatusMethodNotAllowed)
 		return
 	}
+	*/
 
+	glog.Infoln("attempting to make path.Dir(myPath)", path.Dir(myPath))
+
+	// TODO: only Mkdir() if path.Dir() doesn't exist
 	err := s.Fs.Mkdir(path.Dir(myPath))
 	if err != nil {
-		glog.Infoln("error %+v making directory %+v  ", err, myPath)
-
+		glog.Infoln("error %+v making directory %+v  ", err, path.Dir(myPath))
 	}
 
-	// truncate file if exists ???
+	// truncate file if it exists already ???
 	exists := s.pathExists(myPath)
 
 	file, err := s.Fs.Create(myPath)
 	if err != nil {
 		// TODO: having stupid problems?
-		glog.Infoln("DAV:", "error with create path", myPath, "error", err)
+		glog.Infoln("DAV:", "PUT error with create path", myPath, "error", err)
 		w.WriteHeader(StatusConflict)
 		return
 	}
@@ -244,13 +248,14 @@ func (s *Server) doPut(w http.ResponseWriter, r *http.Request) {
 	// using temporary filenames and then atomic rename's ?
 
 	if _, err := io.Copy(file, r.Body); err != nil {
-		glog.Infoln("DAV:", "error with ioCopy", file, "error", err)
+		glog.Infoln("DAV:", "PUT error with ioCopy", file, "error", err)
 		w.WriteHeader(StatusConflict)
 	} else {
 		if exists {
-			glog.Infoln("DAV:", "status no content", file, "error", err)
+			glog.Infoln("DAV:", "PUT status-no-content", file, "error", err)
 			w.WriteHeader(StatusNoContent)
 		} else {
+			glog.Infoln("DAV:", "PUT created", file, "error", err)
 			w.WriteHeader(StatusCreated)
 		}
 	}

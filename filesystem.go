@@ -94,7 +94,7 @@ func (d Dir) Mkdir(name string) error {
 		return err
 	}
 
-	return os.Mkdir(p, os.ModePerm)
+	return os.MkdirAll(p, os.ModePerm)
 }
 
 // Remove calls os.Remove() with a sanitized path

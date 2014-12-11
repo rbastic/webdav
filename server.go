@@ -226,12 +226,11 @@ func (s *Server) doPut(w http.ResponseWriter, r *http.Request) {
 
 	// TODO: content range / partial put ?, re-enable os.MkdirAll()
 
-	/*
-		err := os.MkdirAll(path, 0600)
-		if err != nil {
-			log.Printf("error %+v making directory %+v  ", err, path)
-		}
-	*/
+	err := s.Fs.Mkdir(path)
+	if err != nil {
+		glog.Infoln("error %+v making directory %+v  ", err, path)
+
+	}
 
 	// truncate file if exists
 	file, err := s.Fs.Create(path)

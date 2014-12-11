@@ -55,7 +55,6 @@ func (d Dir) sanitizePath(name string) (string, error) {
 		dir = "."
 	}
 
-	glog.Infoln("name=", name, "path.Clean=", (path.Clean("/" + name)), "fs=", (filepath.FromSlash(path.Clean("/" + name))), "dir=", dir)
 	return filepath.Join(dir, filepath.FromSlash(path.Clean("/"+name))), nil
 }
 

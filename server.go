@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"strings"
 	"time"
+	"path"
 
 	"github.com/golang/glog"
 )
@@ -79,47 +80,47 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // convert request url to path
 func (s *Server) url2path(u *url.URL) string {
-	glog.Infoln("u.Path=", u.Path)
 	if u.Path == "" {
 		return "/"
 	}
 
 	if p := strings.TrimPrefix(u.Path, s.TrimPrefix); len(p) < len(u.Path) {
-		glog.Infoln("strings.Trim,", p, " = ", strings.Trim(p, "/"))
 		return strings.Trim(p, "/")
 	}
 
 	return "/"
 }
 
-// does path exists?
+// TODO: this is really silly
 func (s *Server) pathExists(path string) bool {
 	f, err := s.Fs.Open(path)
 	if err != nil {
 		// TODO: error logging?
 		return false
 	}
-	defer f.Close()
+	f.Close()
 
 	return true
 }
 
-// is path a directory?
+// TODO: this is also pretty silly
 func (s *Server) pathIsDirectory(path string) bool {
 	f, err := s.Fs.Open(path)
 	if err != nil {
 		// TODO: error logging?
 		return false
 	}
-	defer f.Close()
 
 	fi, err := f.Stat()
 	if err != nil {
 		// TODO: error logging?
+		f.Close()
 		return false
 	}
 
-	return fi.IsDir()
+	x := fi.IsDir()
+	f.Close()
+	return x
 }
 
 // http://www.webdav.org/specs/rfc4918.html#rfc.section.9.4
@@ -212,31 +213,28 @@ func (s *Server) doPut(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	path := s.url2path(r.URL)
+	myPath := s.url2path(r.URL)
 
-	if s.pathIsDirectory(path) {
+	if s.pathIsDirectory(myPath) {
 		// use MKCOL instead
-		glog.Infoln("use mkcol instead perhaps, path", path, "is already a directory")
-		glog.Infoln("DAV:", "use mkcol instead perhaps, path", path)
+		glog.Infoln("DAV:", "use mkcol instead perhaps, path", myPath)
 		w.WriteHeader(StatusMethodNotAllowed)
 		return
 	}
 
-	exists := s.pathExists(path)
-
-	// TODO: content range / partial put ?, re-enable os.MkdirAll()
-
-	err := s.Fs.Mkdir(path)
+	err := s.Fs.Mkdir(path.Dir(myPath))
 	if err != nil {
-		glog.Infoln("error %+v making directory %+v  ", err, path)
+		glog.Infoln("error %+v making directory %+v  ", err, myPath)
 
 	}
 
-	// truncate file if exists
-	file, err := s.Fs.Create(path)
+	// truncate file if exists ???
+	exists := s.pathExists(myPath)
+
+	file, err := s.Fs.Create(myPath)
 	if err != nil {
 		// TODO: having stupid problems?
-		glog.Infoln("DAV:", "error with create path", path, "error", err)
+		glog.Infoln("DAV:", "error with create path", myPath, "error", err)
 		w.WriteHeader(StatusConflict)
 		return
 	}
@@ -248,7 +246,6 @@ func (s *Server) doPut(w http.ResponseWriter, r *http.Request) {
 	if _, err := io.Copy(file, r.Body); err != nil {
 		glog.Infoln("DAV:", "error with ioCopy", file, "error", err)
 		w.WriteHeader(StatusConflict)
-		file.Close()
 	} else {
 		if exists {
 			glog.Infoln("DAV:", "status no content", file, "error", err)

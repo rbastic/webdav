@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/golang/glog"
 )
 
 // A FileSystem implements access to a collection of named files.

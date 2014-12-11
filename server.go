@@ -210,6 +210,7 @@ func (s *Server) deleteResource(path string, w http.ResponseWriter, r *http.Requ
 func (s *Server) doPut(w http.ResponseWriter, r *http.Request) {
 	if s.ReadOnly {
 		w.WriteHeader(StatusForbidden)
+		glog.Infoln("DAV:", "PUT Forbidden: server is ReadOnly")
 		return
 	}
 	myPath := s.url2path(r.URL)
@@ -224,12 +225,10 @@ func (s *Server) doPut(w http.ResponseWriter, r *http.Request) {
 	}
 	*/
 
-	glog.Infoln("attempting to make path.Dir(myPath)", path.Dir(myPath))
-
 	// TODO: only Mkdir() if path.Dir() doesn't exist
 	err := s.Fs.Mkdir(path.Dir(myPath))
 	if err != nil {
-		glog.Infoln("error %+v making directory %+v  ", err, path.Dir(myPath))
+		glog.Infoln("DAV:", "PUT error %+v making directory %+v  ", err, path.Dir(myPath))
 	}
 
 	// truncate file if it exists already ???

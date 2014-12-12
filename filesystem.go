@@ -6,7 +6,6 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
-
 )
 
 // A FileSystem implements access to a collection of named files.

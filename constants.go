@@ -7,27 +7,22 @@ import (
 
 // status codes
 const (
-	StatusOK                   = http.StatusOK
-	StatusCreated              = http.StatusCreated
-	StatusAccepted             = http.StatusAccepted
-	StatusNoContent            = http.StatusNoContent
-	StatusMovedPermanently     = http.StatusMovedPermanently
-	StatusMovedTemporarily     = 302 // TODO: duplicate of http.StatusFound ?
-	StatusNotModified          = http.StatusNotModified
-	StatusBadRequest           = http.StatusBadRequest
-	StatusUnauthorized         = http.StatusUnauthorized
-	StatusForbidden            = http.StatusForbidden
-	StatusNotFound             = http.StatusNotFound
-	StatusInternalServerError  = http.StatusInternalServerError
-	StatusNotImplemented       = http.StatusNotImplemented
-	StatusBadGateway           = http.StatusBadGateway
-	StatusServiceUnavailable   = http.StatusServiceUnavailable
-	StatusContinue             = http.StatusContinue
-	StatusMethodNotAllowed     = http.StatusMethodNotAllowed
-	StatusConflict             = http.StatusConflict
-	StatusPreconditionFailed   = http.StatusPreconditionFailed
-	StatusRequestTooLong       = http.StatusRequestEntityTooLarge
-	StatusUnsupportedMediaType = http.StatusUnsupportedMediaType
+	StatusOK                  = http.StatusOK
+	StatusCreated             = http.StatusCreated
+	StatusAccepted            = http.StatusAccepted
+	StatusNoContent           = http.StatusNoContent
+	StatusMovedPermanently    = http.StatusMovedPermanently
+	StatusMovedTemporarily    = 302 // TODO: duplicate of http.StatusFound ?
+	StatusNotModified         = http.StatusNotModified
+	StatusBadRequest          = http.StatusBadRequest
+	StatusUnauthorized        = http.StatusUnauthorized
+	StatusForbidden           = http.StatusForbidden
+	StatusNotFound            = http.StatusNotFound
+	StatusInternalServerError = http.StatusInternalServerError
+	StatusNotImplemented      = http.StatusNotImplemented
+	StatusMethodNotAllowed    = http.StatusMethodNotAllowed
+	StatusConflict            = http.StatusConflict
+	StatusPreconditionFailed  = http.StatusPreconditionFailed
 )
 
 // extended status codes, http://www.webdav.org/specs/rfc4918.html#status.code.extensions.to.http11

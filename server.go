@@ -6,9 +6,9 @@ import (
 	"math/rand"
 	"net/http"
 	"net/url"
+	"path"
 	"strings"
 	"time"
-	"path"
 
 	"github.com/golang/glog"
 )
@@ -35,6 +35,9 @@ type Server struct {
 
 	// files are readonly?
 	ReadOnly bool
+
+	// deletes are disabled
+	DeletesDisabled bool
 
 	// generate directory listings?
 	Listings bool
@@ -174,6 +177,12 @@ func (s *Server) doDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if s.DeletesDisabled {
+		glog.Infoln("DAV:", "DELETE attempted, deletes are disabled", r.URL)
+		w.WriteHeader(StatusForbidden)
+		return
+	}
+
 	if s.deleteResource(s.url2path(r.URL), w, r, true) {
 		glog.Infoln("DAV:", "DELETE successful", r.URL)
 	} else {
@@ -216,13 +225,13 @@ func (s *Server) doPut(w http.ResponseWriter, r *http.Request) {
 	myPath := s.url2path(r.URL)
 
 	/*
-	 * TODO: do something about this.
-	if s.pathIsDirectory(myPath) {
-		// use MKCOL instead
-		glog.Infoln("DAV:", "use mkcol instead perhaps, path", myPath)
-		w.WriteHeader(StatusMethodNotAllowed)
-		return
-	}
+		 * TODO: do something about this.
+		if s.pathIsDirectory(myPath) {
+			// use MKCOL instead
+			glog.Infoln("DAV:", "use mkcol instead perhaps, path", myPath)
+			w.WriteHeader(StatusMethodNotAllowed)
+			return
+		}
 	*/
 
 	// TODO: only Mkdir() if path.Dir() doesn't exist
